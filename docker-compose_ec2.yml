@@ -1,0 +1,162 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: sathvik2003/healthcare_nginx
+    build:
+      context: ./nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api-gateway
+      - frontend
+    networks: 
+      - health_network
+
+  frontend:
+    image: sathvik2003/healthcare_frontend
+    build:
+      context: ./frontend
+    restart: always
+    environment:
+      - ec2-13-201-12-13.ap-south-1.compute.amazonaws.com
+    networks:
+      - health_network
+    expose:
+      - 80
+
+  api-gateway:
+    image: sathvik2003/healthcare_api-gateway
+    build: 
+      context: ./api-gateway
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - SERVER_PORT=3000
+      - DATABASE_HOST=postgres
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=gateway_db
+      - USER_SERVICE_HOST=user-service
+      - USER_SERVICE_PORT=50051
+      - AUTH_SERVICE_HOST=auth-service
+      - AUTH_SERVICE_PORT=50051
+      - DOCTOR_SERVICE_HOST=doctor-service
+      - DOCTOR_SERVICE_PORT=50051
+      - APPOINTMENT_SERVICE_HOST=appointment-service
+      - APPOINTMENT_SERVICE_PORT=50051
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+    depends_on:
+      - postgres
+      - user-service
+      - auth-service
+      - doctor-service
+      - appointment-service
+    networks: 
+      - health_network
+
+  auth-service:
+    image: sathvik2003/healthcare_auth-service
+    build:
+      context: ./auth-service
+    restart: always
+    environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=auth_db
+      - NODE_ENV=production
+      - GRPC_SERVER_PORT=50051
+      - DYNAMO_ENDPOINT=http://dynamodb:8000
+      - DYNAMO_AWS_ACCESS_KEY_ID=${DYNAMO_AWS_ACCESS_KEY_ID}
+      - DYNAMO_AWS_SECRET_ACCESS_KEY=${DYNAMO_AWS_SECRET_ACCESS_KEY}
+      - USER_SERVICE_HOST=user-service
+      - USER_SERVICE_PORT=50051
+    depends_on:
+      - postgres
+      - user-service
+      - dynamodb
+    networks: 
+      - health_network
+
+  user-service:
+    image: sathvik2003/healthcare_user-service
+    build:
+      context: ./user-service
+    restart: always
+    environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=user_db
+      - NODE_ENV=production
+      - GRPC_SERVER_PORT=50051
+    depends_on:
+      - postgres
+    networks: 
+      - health_network
+
+  doctor-service:
+    image: sathvik2003/healthcare_doctor-service
+    build:
+      context: ./doctor-service
+    restart: always
+    environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=doctor_db
+      - NODE_ENV=production
+      - GRPC_SERVER_PORT=50051
+    depends_on:
+      - postgres
+    networks: 
+      - health_network
+
+  appointment-service:
+    image: sathvik2003/healthcare_appointment-service
+    build:
+      context: ./appointment-service
+    restart: always
+    environment:
+      - DATABASE_HOST=postgres
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=appointment_db
+      - NODE_ENV=production
+      - GRPC_SERVER_PORT=50051
+      - DOCTOR_SERVICE_HOST=doctor-service
+      - DOCTOR_SERVICE_PORT=50051
+    depends_on:
+      - postgres
+    networks: 
+      - health_network
+
+  dynamodb:
+    image: amazon/dynamodb-local
+    restart: always
+    command: ["-jar", "DynamoDBLocal.jar", "-sharedDb"]
+    networks:
+      - health_network
+
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+    volumes:
+      - ./postgres-init:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
+    networks: 
+      - health_network
+
+volumes:
+  postgres_data:
+
+networks:
+  health_network:

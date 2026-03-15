@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>HealthCare Pro — Medical Management System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --ink:#0d1117;
+  --ink-2:#4a5568;
+  --ink-3:#9aa5b4;
+  --surface:#ffffff;
+  --surface-2:#f7f8fa;
+  --surface-3:#eef0f4;
+  --line:#e4e7ec;
+  --line-2:#d0d5dd;
+  --blue:#1a56db;
+  --blue-dark:#1447c0;
+  --blue-bg:#eff4ff;
+  --blue-mid:#c3d9ff;
+  --green:#0d7a4e;
+  --green-bg:#ecfdf5;
+  --green-line:#a6f4c5;
+  --red:#b91c1c;
+  --red-bg:#fef2f2;
+  --r:12px;
+  --r-sm:8px;
+  --r-lg:18px;
+  --serif:'DM Serif Display',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+}
+
+body{
+  font-family:var(--sans);
+  background:var(--surface-2);
+  color:var(--ink);
+  font-size:15px;
+  line-height:1.6;
+  min-height:100vh;
+}
+
+/* ── SHELL ── */
+.shell{display:flex;min-height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:230px;
+  flex-shrink:0;
+  background:var(--surface);
+  border-right:1px solid var(--line);
+  display:flex;
+  flex-direction:column;
+}
+
+.sidebar-brand{
+  padding:24px 20px 18px;
+  border-bottom:1px solid var(--line);
+}
+.brand-mark{
+  width:40px;height:40px;
+  background:var(--blue);
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:12px;
+}
+.brand-mark svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.brand-name{font-family:var(--serif);font-size:18px;color:var(--ink);line-height:1.2}
+.brand-sub{font-size:11px;color:var(--ink-3);margin-top:3px;letter-spacing:0.3px}
+
+.nav{flex:1;padding:16px 12px}
+.nav-label{
+  font-size:10px;font-weight:600;
+  color:var(--ink-3);
+  letter-spacing:1px;text-transform:uppercase;
+  padding:0 8px;margin:16px 0 6px;
+}
+.nav-label:first-child{margin-top:0}
+
+.nav-btn{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 10px;border-radius:var(--r-sm);
+  cursor:pointer;font-size:14px;font-weight:400;
+  color:var(--ink-2);
+  background:none;border:none;width:100%;text-align:left;
+  margin-bottom:2px;
+  font-family:var(--sans);
+  transition:background .15s,color .15s;
+}
+.nav-btn:hover{background:var(--surface-2);color:var(--ink)}
+.nav-btn.active{background:var(--blue-bg);color:var(--blue);font-weight:500}
+.nav-btn.active .ni{background:var(--blue);color:#fff}
+.ni{
+  width:28px;height:28px;border-radius:7px;
+  background:var(--surface-3);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:14px;
+  transition:background .15s,color .15s;
+}
+
+.sidebar-foot{
+  padding:14px 12px;
+  border-top:1px solid var(--line);
+}
+.online-badge{
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;color:var(--green);
+  padding:8px 10px;border-radius:var(--r-sm);
+  background:var(--green-bg);
+  font-weight:500;
+}
+.dot{width:7px;height:7px;border-radius:50%;background:#10b981;flex-shrink:0}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+
+.topbar{
+  height:58px;
+  background:var(--surface);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;
+  padding:0 28px;gap:16px;
+  position:sticky;top:0;z-index:50;
+}
+.topbar-title{font-family:var(--serif);font-size:20px;color:var(--ink)}
+.topbar-sub{font-size:13px;color:var(--ink-3)}
+.topbar-spacer{flex:1}
+.step-pills{display:flex;gap:4px}
+.step-pill{
+  padding:5px 13px;border-radius:20px;
+  font-size:12px;font-weight:500;
+  color:var(--ink-3);
+  background:var(--surface-2);
+  border:1px solid var(--line);
+}
+.step-pill.done{color:var(--green);background:var(--green-bg);border-color:var(--green-line)}
+.step-pill.current{color:var(--blue);background:var(--blue-bg);border-color:var(--blue-mid)}
+
+.content{flex:1;padding:28px;overflow-y:auto}
+
+/* ── VIEWS ── */
+.view{display:none}
+.view.active{display:block;animation:fadeUp .25s ease-out both}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.view-header{margin-bottom:24px}
+.view-title{font-family:var(--serif);font-size:28px;color:var(--ink);line-height:1.2}
+.view-desc{font-size:14px;color:var(--ink-2);margin-top:6px}
+
+/* ── LAYOUTS ── */
+.two-col{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start}
+
+/* ── CARD ── */
+.card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg);
+  padding:24px;
+}
+.card+.card{margin-top:16px}
+.card-label{
+  font-size:11px;font-weight:700;
+  color:var(--ink-3);letter-spacing:0.8px;
+  text-transform:uppercase;margin-bottom:16px;
+  display:flex;align-items:center;gap:8px;
+}
+.card-label::after{content:'';flex:1;height:1px;background:var(--line)}
+
+/* ── FORM ── */
+.form-grid{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+.f-full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{
+  font-size:11.5px;font-weight:600;
+  color:var(--ink-2);letter-spacing:0.4px;
+  text-transform:uppercase;
+}
+
+input,select,textarea{
+  font-family:var(--sans);font-size:14px;
+  color:var(--ink);background:var(--surface);
+  border:1.5px solid var(--line-2);
+  border-radius:var(--r-sm);
+  padding:10px 14px;width:100%;
+  transition:border-color .15s,box-shadow .15s;
+  outline:none;appearance:none;
+  -webkit-appearance:none;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(26,86,219,.1);
+}
+input::placeholder,textarea::placeholder{color:var(--ink-3)}
+textarea{resize:vertical;min-height:84px;line-height:1.6}
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239aa5b4'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 14px center;
+  padding-right:36px;cursor:pointer;
+}
+
+/* password toggle */
+.pw-wrap{position:relative}
+.pw-wrap input{padding-right:44px}
+.pw-eye{
+  position:absolute;right:12px;top:50%;
+  transform:translateY(-50%);
+  background:none;border:none;
+  cursor:pointer;color:var(--ink-3);
+  padding:4px;font-size:16px;
+  display:flex;align-items:center;
+  transition:color .15s;
+  /* override global button styles */
+  width:auto !important;
+  margin:0 !important;
+  box-shadow:none !important;
+  border-radius:4px;
+}
+.pw-eye:hover{color:var(--blue);transform:translateY(-50%) scale(1.1)}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 20px;
+  border-radius:var(--r-sm);
+  font-family:var(--sans);font-size:14px;font-weight:500;
+  cursor:pointer;
+  transition:all .18s;
+  border:none;width:100%;
+  text-align:center;
+  margin-top:4px;
+  line-height:1.4;
+  text-decoration:none;
+}
+.btn-primary{
+  background:var(--blue);
+  color:#ffffff !important;
+}
+.btn-primary:hover{
+  background:var(--blue-dark);
+  box-shadow:0 4px 14px rgba(26,86,219,.3);
+  transform:translateY(-1px);
+}
+.btn-primary:active{transform:scale(.98);box-shadow:none}
+
+.btn-outline{
+  background:var(--surface);
+  color:var(--ink-2) !important;
+  border:1.5px solid var(--line-2);
+}
+.btn-outline:hover{
+  background:var(--surface-2);
+  color:var(--ink) !important;
+  border-color:var(--ink-3);
+}
+
+.btn-teal{
+  background:var(--green-bg);
+  color:var(--green) !important;
+  border:1.5px solid var(--green-line);
+}
+.btn-teal:hover{background:#d1fae5}
+
+.btn-sm{
+  padding:6px 12px;
+  font-size:12px;border-radius:7px;
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  color:var(--ink-2);
+  cursor:pointer;white-space:nowrap;
+  font-family:var(--sans);font-weight:500;
+  transition:all .15s;
+  width:auto;margin:0;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.btn-sm:hover{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-mid)}
+
+.btn-stack{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+
+/* ── ID REVEAL ── */
+.id-reveal{
+  display:none;align-items:center;gap:10px;
+  padding:12px 14px;
+  background:var(--blue-bg);
+  border:1.5px solid var(--blue-mid);
+  border-radius:var(--r-sm);
+  margin-top:14px;
+}
+.id-reveal.show{display:flex}
+.id-lbl{font-size:12px;color:var(--blue);font-weight:600;white-space:nowrap}
+.id-val{
+  font-family:'SF Mono','Fira Code',monospace;
+  font-size:15px;font-weight:700;
+  color:var(--blue);flex:1;
+}
+.copy-btn{
+  padding:7px 13px;
+  background:var(--blue);color:#fff;
+  border:none;border-radius:7px;
+  font-size:12px;font-weight:500;
+  cursor:pointer;white-space:nowrap;
+  width:auto;margin:0;
+  font-family:var(--sans);
+  transition:background .15s;
+}
+.copy-btn:hover{background:var(--blue-dark)}
+.copy-btn.copied{background:var(--green)}
+
+/* ── DIRECTORY ── */
+.dir-panel{
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:var(--r-sm);
+  padding:14px;
+}
+.dir-head{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:12px;
+}
+.dir-head span{
+  font-size:11px;font-weight:700;
+  color:var(--ink-3);letter-spacing:0.8px;
+  text-transform:uppercase;
+}
+
+.doc-row{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--r-sm);
+  margin-bottom:8px;
+  transition:border-color .15s;
+}
+.doc-row:last-child{margin-bottom:0}
+.doc-row:hover{border-color:var(--blue-mid)}
+.doc-avatar{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--blue-bg);color:var(--blue);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;flex-shrink:0;
+}
+.doc-info{flex:1;min-width:0}
+.doc-name{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-meta{font-size:11.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.id-chip{
+  font-family:monospace;font-size:11px;
+  background:var(--surface-3);color:var(--ink-2);
+  border:1px solid var(--line);border-radius:5px;
+  padding:3px 7px;white-space:nowrap;flex-shrink:0;
+}
+
+/* ── SUCCESS BOX ── */
+.success-box{
+  display:none;
+  background:var(--green-bg);
+  border:1.5px solid var(--green-line);
+  border-radius:var(--r-sm);
+  padding:14px 16px;
+  margin-top:14px;
+}
+.success-box.show{display:block}
+.success-box h4{
+  font-size:13px;font-weight:700;
+  color:var(--green);margin-bottom:8px;
+  display:flex;align-items:center;gap:6px;
+}
+.success-box p{font-size:13px;color:#065f46;margin-bottom:4px}
+
+/* ── APPT CARD ── */
+.appt-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--r-sm);
+  padding:14px 16px;
+  margin-bottom:10px;
+  transition:border-color .15s;
+}
+.appt-card:hover{border-color:var(--blue-mid)}
+.appt-card:last-child{margin-bottom:0}
+.appt-card p{font-size:13px;color:var(--ink-2);margin-bottom:4px}
+.appt-card strong{color:var(--ink)}
+
+/* ── FEATURE LIST (register sidebar) ── */
+.feature-list{display:flex;flex-direction:column;gap:14px}
+.feature-item{display:flex;gap:12px;align-items:flex-start}
+.feature-icon{
+  width:34px;height:34px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+}
+.feature-icon.blue{background:var(--blue-bg)}
+.feature-icon.green{background:var(--green-bg)}
+.feature-icon.amber{background:#fef3c7}
+.feature-item h4{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.feature-item p{font-size:12px;color:var(--ink-2);line-height:1.5}
+
+/* ── DIVIDER ── */
+.divider{
+  display:flex;align-items:center;gap:10px;
+  margin:18px 0 14px;
+  color:var(--ink-3);
+  font-size:11px;font-weight:700;
+  letter-spacing:0.8px;text-transform:uppercase;
+}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--line)}
+
+/* ── TOASTS ── */
+.toast-stack{
+  position:fixed;top:16px;right:16px;
+  z-index:9999;
+  display:flex;flex-direction:column;gap:8px;
+  pointer-events:none;
+}
+.toast{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--r-sm);
+  padding:12px 15px;
+  display:flex;align-items:center;gap:9px;
+  min-width:270px;max-width:380px;
+  pointer-events:auto;
+  border-left:3px solid;
+  box-shadow:0 4px 24px rgba(0,0,0,.1);
+  animation:tIn .2s ease-out;
+}
+.toast.ok{border-left-color:#10b981}
+.toast.err{border-left-color:var(--red)}
+.toast-msg{flex:1;font-size:13px;font-weight:500;color:var(--ink)}
+.toast-x{
+  background:none;border:none;
+  color:var(--ink-3);cursor:pointer;
+  font-size:18px;line-height:1;
+  padding:0;width:auto;margin:0;box-shadow:none;
+  font-family:var(--sans);
+}
+.toast-x:hover{color:var(--ink)}
+@keyframes tIn{
+  from{opacity:0;transform:translateX(16px)}
+  to{opacity:1;transform:translateX(0)}
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px){
+  .sidebar{display:none}
+  .two-col{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .f-full{grid-column:1}
+  .topbar{padding:0 16px}
+  .content{padding:16px}
+  .step-pills{display:none}
+}
+@media(max-width:500px){
+  .topbar-sub{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="toast-stack" id="toasts"></div>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24">
+          <path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/>
+          <path d="M16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z"/>
+          <path d="M12 12v4M10 14h4"/>
+        </svg>
+      </div>
+      <div class="brand-name">HealthCare Pro</div>
+      <div class="brand-sub">Medical Management System</div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-label">Account</div>
+      <button class="nav-btn active" id="nb-register" onclick="go('register')">
+        <span class="ni">✍️</span>Register
+      </button>
+      <button class="nav-btn" id="nb-login" onclick="go('login')">
+        <span class="ni">🔑</span>Sign in
+      </button>
+
+      <div class="nav-label">Workflow</div>
+      <button class="nav-btn" id="nb-doctor" onclick="go('doctor')">
+        <span class="ni">👨‍⚕️</span>Affiliate doctor
+      </button>
+      <button class="nav-btn" id="nb-appointment" onclick="go('appointment')">
+        <span class="ni">📅</span>Book appointment
+      </button>
+      <button class="nav-btn" id="nb-visits" onclick="go('visits')">
+        <span class="ni">🗓️</span>My visits
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="online-badge">
+        <span class="dot"></span>System online
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="topbar-title">Create account</div>
+        <div class="topbar-sub" id="topbar-sub">Get started in minutes</div>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="step-pills" id="step-pills">
+        <span class="step-pill current">1 Register</span>
+        <span class="step-pill">2 Login</span>
+        <span class="step-pill">3 Affiliate</span>
+        <span class="step-pill">4 Book</span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- REGISTER -->
+      <div class="view active" id="v-register">
+        <div class="view-header">
+          <div class="view-title">Welcome to HealthCare Pro</div>
+          <div class="view-desc">Create your account to manage appointments and connect with doctors.</div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-label">Your details</div>
+            <div class="form-grid" style="grid-template-columns:1fr">
+              <div class="field">
+                <label>Full name</label>
+                <input id="reg-name" type="text" placeholder="e.g. Arjun Menon">
+              </div>
+              <div class="field">
+                <label>Email address</label>
+                <input id="reg-email" type="email" placeholder="you@example.com">
+              </div>
+              <div class="field">
+                <label>Password</label>
+                <div class="pw-wrap">
+                  <input id="reg-pw" type="password" placeholder="Create a strong password">
+                  <button class="pw-eye" type="button" onclick="togglePw('reg-pw',this)">👁</button>
+                </div>
+              </div>
+            </div>
+            <div class="btn-stack">
+              <button class="btn btn-primary" onclick="register()">Create account →</button>
+              <button class="btn btn-outline" onclick="go('login')">Already have an account? Sign in</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-label">Why register?</div>
+            <div class="feature-list">
+              <div class="feature-item">
+                <div class="feature-icon blue">📅</div>
+                <div>
+                  <h4>Book appointments</h4>
+                  <p>Schedule visits with affiliated doctors instantly, from anywhere.</p>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon green">🏥</div>
+                <div>
+                  <h4>Doctor directory</h4>
+                  <p>Browse and affiliate with specialists across multiple fields.</p>
+                </div>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon amber">📋</div>
+                <div>
+                  <h4>Visit history</h4>
+                  <p>Track all your past and upcoming appointments in one place.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOGIN -->
+      <div class="view" id="v-login">
+        <div class="view-header">
+          <div class="view-title">Welcome back</div>
+          <div class="view-desc">Sign in to your HealthCare Pro account to continue.</div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-label">Sign in</div>
+            <div class="form-grid" style="grid-template-columns:1fr">
+              <div class="field">
+                <label>Email address</label>
+                <input id="log-email" type="email" placeholder="you@example.com">
+              </div>
+              <div class="field">
+                <label>Password</label>
+                <div class="pw-wrap">
+                  <input id="log-pw" type="password" placeholder="Your password">
+                  <button class="pw-eye" type="button" onclick="togglePw('log-pw',this)">👁</button>
+                </div>
+              </div>
+            </div>
+            <div class="btn-stack">
+              <button class="btn btn-primary" onclick="login()">Sign in →</button>
+              <button class="btn btn-outline" onclick="go('register')">Don't have an account? Register</button>
+            </div>
+          </div>
+          <div></div>
+        </div>
+      </div>
+
+      <!-- DOCTOR -->
+      <div class="view" id="v-doctor">
+        <div class="view-header">
+          <div class="view-title">Affiliate a doctor</div>
+          <div class="view-desc">Link with a doctor to enable appointment booking.</div>
+        </div>
+        <div class="two-col">
+          <div>
+            <div class="card">
+              <div class="card-label">Doctor details</div>
+              <div class="form-grid">
+                <div class="field f-full">
+                  <label>Full name</label>
+                  <input id="doc-name" type="text" placeholder="e.g. Dr. Raj Gopal">
+                </div>
+                <div class="field f-full">
+                  <label>Email address</label>
+                  <input id="doc-email" type="email" placeholder="doctor@hospital.com">
+                </div>
+                <div class="field">
+                  <label>Qualification</label>
+                  <select id="doc-spec">
+                    <option value="">Select qualification</option>
+                    <option>MD - General Medicine</option>
+                    <option>MD - Cardiology</option>
+                    <option>MD - Gastroenterology</option>
+                    <option>MD - Dermatology</option>
+                    <option>MS - Orthopedics</option>
+                    <option>Diploma - Pharmacy</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Medical field</label>
+                  <select id="doc-field">
+                    <option value="">Select field</option>
+                    <option>General Medicine</option>
+                    <option>Gastroenterology</option>
+                    <option>Pharmacy</option>
+                    <option>Pediatrics</option>
+                    <option>Dermatology</option>
+                    <option>Cardiology</option>
+                  </select>
+                </div>
+              </div>
+              <div class="btn-stack">
+                <button class="btn btn-primary" onclick="affiliateDoc()">Affiliate doctor →</button>
+              </div>
+              <div class="id-reveal" id="doc-id-row">
+                <span class="id-lbl">Doctor ID</span>
+                <span id="doc-id-val" class="id-val"></span>
+                <button class="copy-btn" onclick="copyId()">Copy</button>
+              </div>
+            </div>
+            <div class="btn-stack" style="margin-top:12px">
+              <button class="btn btn-teal" onclick="go('appointment')">Continue to booking →</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="dir-head">
+              <span>Doctor directory</span>
+              <button class="btn-sm" onclick="loadDocs()">↻ Refresh</button>
+            </div>
+            <div id="doc-dir">
+              <p style="font-size:13px;color:var(--ink-3)">No doctors affiliated yet.</p>
+            </div>
+            <p style="font-size:11px;color:var(--ink-3);margin-top:10px">Click Select to autofill booking details.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- APPOINTMENT -->
+      <div class="view" id="v-appointment">
+        <div class="view-header">
+          <div class="view-title">Book an appointment</div>
+          <div class="view-desc">Schedule your visit — all required fields must be filled.</div>
+        </div>
+        <div class="two-col">
+          <div class="card">
+            <div class="card-label">Appointment details</div>
+            <div class="form-grid">
+              <div class="field f-full">
+                <label>Doctor ID</label>
+                <input id="appt-did" type="text" placeholder="Paste doctor ID or select from directory" onchange="prefillDoc()">
+              </div>
+              <div class="field">
+                <label>Doctor name</label>
+                <input id="appt-dname" type="text" placeholder="Auto-filled from ID">
+              </div>
+              <div class="field">
+                <label>Specialty</label>
+                <input id="appt-dspec" type="text" placeholder="Auto-filled from ID">
+              </div>
+              <div class="field f-full">
+                <label>Patient name</label>
+                <input id="appt-pname" type="text" placeholder="Full name of the patient">
+              </div>
+              <div class="field">
+                <label>Date</label>
+                <input id="appt-date" type="date">
+              </div>
+              <div class="field">
+                <label>Time slot</label>
+                <select id="appt-time">
+                  <option value="">Select time</option>
+                  <option value="09:00">9:00 AM</option>
+                  <option value="10:00">10:00 AM</option>
+                  <option value="11:00">11:00 AM</option>
+                  <option value="12:00">12:00 PM</option>
+                  <option value="14:00">2:00 PM</option>
+                  <option value="15:00">3:00 PM</option>
+                  <option value="16:00">4:00 PM</option>
+                  <option value="17:00">5:00 PM</option>
+                </select>
+              </div>
+              <div class="field f-full">
+                <label>Patient age</label>
+                <input id="appt-age" type="number" min="1" max="120" placeholder="e.g. 34">
+              </div>
+              <div class="field f-full">
+                <label>Reason for visit / symptoms</label>
+                <textarea id="appt-reason" placeholder="Describe your symptoms or reason for the visit"></textarea>
+              </div>
+              <div class="field f-full">
+                <label>Known allergies <span style="font-weight:400;font-size:10px;letter-spacing:0;text-transform:none;color:var(--ink-3)">(optional)</span></label>
+                <textarea id="appt-allergy" placeholder="List any known drug or food allergies" style="min-height:64px"></textarea>
+              </div>
+            </div>
+            <div class="btn-stack">
+              <button class="btn btn-primary" onclick="bookAppt()">Schedule appointment →</button>
+            </div>
+            <div class="success-box" id="appt-success">
+              <h4>✓ Appointment booked successfully</h4>
+              <div id="appt-details"></div>
+            </div>
+            <div class="btn-stack" style="margin-top:10px">
+              <button class="btn btn-outline" onclick="go('visits')">View my appointments</button>
+              <button class="btn btn-outline" onclick="go('doctor')">← Back to affiliate</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="dir-head">
+              <span>Doctor directory</span>
+              <button class="btn-sm" onclick="loadDocs()">↻ Refresh</button>
+            </div>
+            <div id="appt-dir">
+              <p style="font-size:13px;color:var(--ink-3)">No doctors found. Affiliate one first.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISITS -->
+      <div class="view" id="v-visits">
+        <div class="view-header">
+          <div class="view-title">My appointments</div>
+          <div class="view-desc">All your booked visits in one place.</div>
+        </div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <span style="font-size:13px;color:var(--ink-2)">Appointments for current doctor</span>
+            <button class="btn-sm" onclick="loadVisits()">↻ Refresh</button>
+          </div>
+          <div id="visits-list">
+            <p style="font-size:13px;color:var(--ink-3)">No appointments yet.</p>
+          </div>
+          <div class="btn-stack" style="margin-top:16px">
+            <button class="btn btn-outline" onclick="go('appointment')">← Back to booking</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+
+</div><!-- /shell -->
+
+<script>
+const baseUrl = (window.location.origin && window.location.origin !== 'null')
+  ? window.location.origin
+  : ('http://' + (window.location.hostname || 'localhost'));
+let token = '';
+let docDir = [];
+
+const DEFAULT_DOCTORS = [
+  { id: '1', name: 'Dr. Nisha Sharma', email: 'nisha@clinic.com', specialty: 'MD - General Medicine', field: 'General Medicine' },
+  { id: '2', name: 'Dr. Amit Verma', email: 'amit@clinic.com', specialty: 'MD - Cardiology', field: 'Cardiology' },
+  { id: '3', name: 'Dr. Priya Rao', email: 'priya@clinic.com', specialty: 'MD - Gastroenterology', field: 'Gastroenterology' },
+  { id: '4', name: 'Dr. Rina Patel', email: 'rina@clinic.com', specialty: 'Diploma - Pharmacy', field: 'Pharmacy' },
+];
+
+const pageMap = {
+  register: { vid:'v-register', nid:'nb-register', title:'Create account',      sub:'Get started in minutes',     step:0 },
+  login:    { vid:'v-login',    nid:'nb-login',    title:'Sign in',              sub:'Access your account',        step:1 },
+  doctor:   { vid:'v-doctor',   nid:'nb-doctor',   title:'Affiliate doctor',     sub:'Link with a specialist',     step:2 },
+  appointment:{ vid:'v-appointment', nid:'nb-appointment', title:'Book appointment', sub:'Schedule your visit',    step:3 },
+  visits:   { vid:'v-visits',   nid:'nb-visits',   title:'My visits',            sub:'Track your appointments',    step:3 }
+};
+
+function go(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+
+  const p = pageMap[id];
+  if (!p) return;
+
+  document.getElementById(p.vid).classList.add('active');
+  document.getElementById(p.nid).classList.add('active');
+  document.getElementById('topbar-title').textContent = p.title;
+  document.getElementById('topbar-sub').textContent = p.sub;
+
+  const pills = document.querySelectorAll('.step-pill');
+  pills.forEach((pill, i) => {
+    pill.classList.remove('current', 'done');
+    if (i < p.step) pill.classList.add('done');
+    if (i === p.step) pill.classList.add('current');
+  });
+
+  if (id === 'appointment') {
+    document.getElementById('appt-date').min = new Date().toISOString().split('T')[0];
+    loadDocs();
+  }
+  if (id === 'doctor') loadDocs();
+}
+
+function toast(msg, ok = true) {
+  const c = document.getElementById('toasts');
+  const t = document.createElement('div');
+  t.className = 'toast ' + (ok ? 'ok' : 'err');
+  t.innerHTML = `<span class="toast-msg">${msg}</span><button class="toast-x" onclick="this.parentElement.remove()">×</button>`;
+  c.appendChild(t);
+  setTimeout(() => {
+    t.style.transition = 'opacity .3s';
+    t.style.opacity = '0';
+    setTimeout(() => t.remove(), 300);
+  }, 4000);
+}
+
+function togglePw(id, btn) {
+  const input = document.getElementById(id);
+  input.type = input.type === 'password' ? 'text' : 'password';
+  btn.textContent = input.type === 'password' ? '👁' : '🙈';
+}
+
+async function register() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pw = document.getElementById('reg-pw').value;
+  if (!name || !email || !pw) { toast('Please fill in all fields', false); return; }
+  try {
+    const r = await fetch(baseUrl + '/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password: pw })
+    });
+    const d = await r.json().catch(() => ({}));
+    if (r.ok) {
+      toast('Account created! Redirecting to sign in…');
+      setTimeout(() => { go('login'); document.getElementById('log-email').value = email; }, 1500);
+    } else {
+      toast(d.error || 'Registration failed', false);
+    }
+  } catch(e) { toast('Network error: ' + e.message, false); }
+}
+
+async function login() {
+  const email = document.getElementById('log-email').value.trim();
+  const pw = document.getElementById('log-pw').value;
+  if (!email || !pw) { toast('Please fill in all fields', false); return; }
+  try {
+    const r = await fetch(baseUrl + '/users/authenticate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pw })
+    });
+    const d = await r.json().catch(() => ({}));
+    if (r.ok) {
+      token = d.sessionId || d.token || '';
+      toast('Signed in! Affiliate a doctor next.');
+      setTimeout(() => { go('doctor'); loadDocs(); }, 1500);
+    } else {
+      toast(d.error || 'Login failed', false);
+    }
+  } catch(e) { toast('Network error: ' + e.message, false); }
+}
+
+async function affiliateDoc() {
+  if (!token) { toast('Please sign in first', false); return; }
+  const name  = document.getElementById('doc-name').value.trim();
+  const email = document.getElementById('doc-email').value.trim();
+  const spec  = document.getElementById('doc-spec').value;
+  const field = document.getElementById('doc-field').value;
+  if (!name || !email || !spec || !field) { toast('Please fill in all doctor fields', false); return; }
+  try {
+    const r = await fetch(baseUrl + '/doctors', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ name, email, specialty: spec, field })
+    });
+    if (!r.ok) { const e = await r.json().catch(() => ({})); toast(e.error || 'Failed to affiliate', false); return; }
+    const d = await r.json();
+    const did = d.id || d.payload?.id || Math.random().toString(36).substr(2, 8).toUpperCase();
+    document.getElementById('doc-id-val').textContent = did;
+    document.getElementById('doc-id-row').classList.add('show');
+    document.getElementById('appt-did').value = did;
+    document.getElementById('appt-dname').value = name;
+    document.getElementById('appt-dspec').value = spec + ' (' + field + ')';
+    ['doc-name','doc-email'].forEach(id => document.getElementById(id).value = '');
+    ['doc-spec','doc-field'].forEach(id => document.getElementById(id).value = '');
+    toast('Dr. ' + name + ' affiliated — ID: ' + did);
+    await loadDocs();
+  } catch(e) { toast('Network error: ' + e.message, false); }
+}
+
+async function loadDocs() {
+  if (!token) {
+    docDir = DEFAULT_DOCTORS;
+    renderDoctorDirectory(docDir);
+    return;
+  }
+
+  try {
+    const r = await fetch(baseUrl + '/doctors', { headers: { Authorization: 'Bearer ' + token } });
+    if (!r.ok) {
+      docDir = DEFAULT_DOCTORS;
+      renderDoctorDirectory(docDir);
+      return;
+    }
+    const data = await r.json();
+    if (!Array.isArray(data) || data.length === 0) {
+      docDir = DEFAULT_DOCTORS;
+    } else {
+      docDir = data;
+    }
+    renderDoctorDirectory(docDir);
+  } catch (e) {
+    console.error(e);
+    docDir = DEFAULT_DOCTORS;
+    renderDoctorDirectory(docDir);
+  }
+}
+
+function renderDoctorDirectory(doctors) {
+  const noneHtml = '<p style="font-size:13px;color:var(--ink-3)">No doctors affiliated yet.</p>';
+  const html = doctors.length
+    ? doctors.map(doc => {
+       const ini = (doc.name || 'DR').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+       const safeName = (doc.name || '').replace(/'/g, "\\'");
+       const safeSpec = (doc.specialty || '').replace(/'/g, "\\'");
+       const safeField = (doc.field || '').replace(/'/g, "\\'");
+       return `<div class="doc-row">
+         <div class="doc-avatar">${ini}</div>
+         <div class="doc-info">
+           <div class="doc-name">${doc.name || 'Unknown'}</div>
+           <div class="doc-meta">${doc.specialty || 'General'} · ${doc.email || ''}</div>
+         </div>
+         <span class="id-chip">${doc.id || 'n/a'}</span>
+         <button class="btn-sm" onclick="selectDoc('${doc.id || ''}','${safeName}','${safeSpec}','${safeField}')">Select</button>
+       </div>`;
+     }).join('')
+    : noneHtml;
+  ['doc-dir','appt-dir'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+  });
+}
+
+async function prefillDoc() {
+  const id = document.getElementById('appt-did').value.trim();
+  if (!id) return;
+  const doc = docDir.find(d => String(d.id) === String(id));
+  if (doc) {
+    document.getElementById('appt-dname').value = doc.name || '';
+    document.getElementById('appt-dspec').value = (doc.specialty || '') + ' (' + (doc.field || 'General') + ')';
+    toast('Doctor details filled');
+    return;
+  }
+  if (!token) return;
+  try {
+    const r = await fetch(baseUrl + '/doctors/' + id, { headers: { Authorization: 'Bearer ' + token } });
+    if (!r.ok) { toast('Doctor ID not found', false); return; }
+    const d = await r.json();
+    document.getElementById('appt-dname').value = d.name || '';
+    document.getElementById('appt-dspec').value = (d.specialty || '') + ' (' + (d.field || 'General') + ')';
+    toast('Doctor details filled');
+  } catch(e) {}
+}
+
+function selectDoc(id, name, spec, field) {
+  document.getElementById('appt-did').value = id;
+  document.getElementById('appt-dname').value = name;
+  document.getElementById('appt-dspec').value = spec + ' (' + (field || 'General') + ')';
+  toast('Selected ' + name);
+  const existing = docDir.find(d => String(d.id) === String(id));
+  if (existing) {
+    docDir = docDir.map(d => ({ ...d, selected: String(d.id) === String(id) }));
+  }
+  loadVisits();
+}
+
+async function bookAppt() {
+  if (!token) { toast('Please sign in first', false); return; }
+  const did    = document.getElementById('appt-did').value.trim();
+  const dname  = document.getElementById('appt-dname').value.trim();
+  const dspec  = document.getElementById('appt-dspec').value.trim();
+  const pname  = document.getElementById('appt-pname').value.trim();
+  const date   = document.getElementById('appt-date').value;
+  const time   = document.getElementById('appt-time').value;
+  const age    = document.getElementById('appt-age').value;
+  const reason = document.getElementById('appt-reason').value.trim();
+  const allergy= document.getElementById('appt-allergy').value.trim();
+  if (!did || !date || !time || !pname || !age || !reason) { toast('Please fill all required fields', false); return; }
+  const sel = new Date(date); const now = new Date(); now.setHours(0,0,0,0);
+  if (sel < now) { toast('Please select a future date', false); return; }
+  try {
+    const r = await fetch(baseUrl + '/doctors/' + did + '/appointments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({
+        doctor_name: dname, doctor_specialty: dspec,
+        patient_name: pname,
+        appointment_date: new Date(date + 'T' + time).toISOString(),
+        appointment_time: time,
+        age: Number(age),
+        reason_for_visit: reason, chief_complaint: reason,
+        known_allergies: allergy || null
+      })
+    });
+    const d = await r.json();
+    if (r.ok) {
+      toast('Appointment scheduled successfully!');
+      const box = document.getElementById('appt-success');
+      box.classList.add('show');
+      document.getElementById('appt-details').innerHTML =
+        `<p><strong>Doctor:</strong> ${dname} · ${dspec}</p>
+         <p><strong>Patient:</strong> ${pname}, age ${age}</p>
+         <p><strong>When:</strong> ${date} at ${time}</p>
+         <p><strong>Reason:</strong> ${reason}</p>`;
+      ['appt-did','appt-dname','appt-dspec','appt-pname','appt-date','appt-age','appt-reason','appt-allergy']
+        .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+      document.getElementById('appt-time').value = '';
+    } else {
+      toast(d.error || 'Booking failed', false);
+    }
+  } catch(e) { toast('Network error: ' + e.message, false); }
+}
+
+async function loadVisits() {
+  let did = document.getElementById('appt-did')?.value.trim();
+  if (!did) {
+    const selectedDoctor = docDir.find(d => d.selected);
+    if (selectedDoctor) {
+      did = String(selectedDoctor.id || '');
+      document.getElementById('appt-did').value = did;
+    }
+  }
+  if (!did && docDir.length > 0) {
+    did = String(docDir[0].id || '');
+    document.getElementById('appt-did').value = did;
+  }
+  if (!did) { toast('Choose a doctor first from the directory', false); return; }
+  try {
+    const r = await fetch(baseUrl + '/doctors/' + did + '/appointments', {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    const d = await r.json();
+    const el = document.getElementById('visits-list');
+    if (!r.ok) { toast(d.error || 'Failed to load', false); return; }
+    if (!Array.isArray(d) || !d.length) {
+      el.innerHTML = '<p style="font-size:13px;color:var(--ink-3)">No appointments found for this doctor.</p>';
+      return;
+    }
+    el.innerHTML = d.map(a => `
+      <div class="appt-card">
+        <p><strong>ID:</strong> ${a.id || 'n/a'}</p>
+        <p><strong>Patient:</strong> ${a.user_data?.patient_name || 'Unknown'}</p>
+        <p><strong>Date:</strong> ${new Date(a.start_time).toLocaleString()}</p>
+        <p><strong>Reason:</strong> ${a.user_data?.reason_for_visit || 'N/A'}</p>
+      </div>`).join('');
+  } catch(e) { toast('Network error: ' + e.message, false); }
+}
+
+function copyId() {
+  const val = document.getElementById('doc-id-val').textContent;
+  navigator.clipboard.writeText(val).then(() => {
+    const btn = event.target;
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => { toast('Copy failed — please copy manually', false); });
+}
+
+// init
+go('register');
+</script>
+</body>
+</html>
